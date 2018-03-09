@@ -14,6 +14,7 @@ var testHex;
 var hexagons = [];
 
 let testBS;
+let sulaco;
 
 function preload(){
   BS3img = loadImage("/assets/BS_lvl3.png");
@@ -37,7 +38,9 @@ function setup() {
   for (var i=0; i<5;i++){
     hexagons.push(new HexShape(230/2+150+margin+i*235,margin+75,230));
   }
-
+  bPane = new battlePane;
+  sulaco=new BattleShip(2);
+  sulaco.weapon=new Battery(5);
   //default drawing settings
   noStroke();
 
@@ -50,11 +53,8 @@ function windowResized(){
 function draw() {
   // put drawing code here
   background(0);
-  bPane = new battlePane;
-  bPane.display();
 
-  sulaco=new BattleShip(600,100,2);
-  sulaco.weapon=new Battery(5);
+  bPane.display();
   sulaco.display();
 
  fill(255);
@@ -67,16 +67,21 @@ function draw() {
 
 }
 
+function mouseClicked(){
+  sulaco.clicked(mouseX,mouseY);
+  print("CLICK");
+}
 //battleShip class
 class BattleShip {
 
-    constructor(xPos, yPos, lvl=1) {
+    constructor(lvl=1) {
     var strengths=[0,4000,5000,6000,7500,9000];
     this.level=lvl;
     this.hullStrength=strengths[lvl];
     this.speed=600;
-    this.x = xPos;
-    this.y = yPos;
+    this.x = 400;
+    this.y = 100;
+    this.selected=false;
 
     //slots
     this.supportSlots=lvl-1;
@@ -88,12 +93,30 @@ class BattleShip {
   display(){
     push();
     angleMode(DEGREES);
-    translate(this.x+BS3img.height/8,this.y-BS3img.width/8);
+    translate(this.x+BS3img.height/16,this.y-BS3img.width/16);
+    if (this.selected){
+      stroke(greys[1]);
+      noFill();
+      ellipse(0,0,100);
+    }
     rotate(45);
     //tint(greys[0]);
     image(BS3img,0,0,BS3img.width/8,BS3img.height/8);
     pop();
   }
+
+  rollOver(px,py){
+
+  }
+
+  clicked(px,py){
+    let d= dist(px,py,this.x,this.y);
+    if (d<10){
+      this.selected=true;
+      print("HIT!");
+    }
+  }
+
 }
 
 class Battery{
