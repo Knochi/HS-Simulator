@@ -2,44 +2,47 @@
 var BS3img;
 
 var margin = 20;
+//sizing
+//yellow star sector is 750AU
+//red star sector is 450AU
+//WZ 400AU (flat sides)
+
 //palette
 var greys =[];
-var cyan;
-var cyanLight;
+var cyans = [];
 
 var totalRows=0;
 
 //static objects
 var testHex;
 var hexagons = [];
-
 let testBS;
-let sulaco;
 
 function preload(){
-  BS3img = loadImage("/assets/BS_lvl3.png");
+  BS3img = loadImage("/assets/BS_lvl3n.png");
 }
 
 function setup() {
   //initialize palletes with 100%, 60% and 20% alpha
   greys = [color('#434446ff'),color('#4344469a'),color('#43444633')];
-  cyan = color('#434446');
+  cyans = [color('#9bfae0ff'),color('#9bfae09a'),color('#9bfae033')];
+  blues = [color('#9fe5fdff'),color('#9fe5fd9a'),color('#9fe5fd33')];
+  pinks = [color('#fbb6c7ff'),color('#fbb6c79a'),color('#fbb6c733')];
+  yellows = [color('#f7e99bff'),color('#f7e99b9a'),color('#f7e99b33')];
+  purples = [color('#ab9addff'),color('#ab9add9a'),color('#ab9add33')];
 
   var cnv = createCanvas(windowWidth, windowHeight);
   cnv.style('display','block');
 
-  //setup color palette
-  cyan = color(255,204,0);
-  cyanLight = color('#a9edd833');
-  testHex = new HexShape(350,margin+75,150);
   //textSize(32);
-
+ var hexSizePx = 200;
+ var hexGap = 3;
   //create static objects
-  for (var i=0; i<5;i++){
-    hexagons.push(new HexShape(230/2+150+margin+i*235,margin+75,230));
+  for (var i=0; i<7;i++){
+    hexagons.push(new HexShape(hexSizePx/2+150+margin+i*(hexSizePx+hexGap),margin+75,hexSizePx));
   }
   bPane = new battlePane;
-  sulaco=new BattleShip(2);
+  sulaco=new BattleShip(100,60,2);
   sulaco.weapon=new Battery(5);
   //default drawing settings
   noStroke();
@@ -50,6 +53,7 @@ function windowResized(){
   resizeCanvas(windowWidth,windowHeight);
 }
 
+//forever loop
 function draw() {
   // put drawing code here
   background(0);
@@ -67,21 +71,17 @@ function draw() {
 
 }
 
-function mouseClicked(){
-  sulaco.clicked(mouseX,mouseY);
-  print("CLICK");
-}
 //battleShip class
 class BattleShip {
 
-    constructor(lvl=1) {
+    constructor(xPos, yPos, lvl=1) {
     var strengths=[0,4000,5000,6000,7500,9000];
     this.level=lvl;
     this.hullStrength=strengths[lvl];
     this.speed=600;
-    this.x = 400;
-    this.y = 100;
-    this.selected=false;
+    this.x = xPos;
+    this.y = yPos;
+    this.scale = 0.25;
 
     //slots
     this.supportSlots=lvl-1;
@@ -93,30 +93,14 @@ class BattleShip {
   display(){
     push();
     angleMode(DEGREES);
-    translate(this.x+BS3img.height/16,this.y-BS3img.width/16);
-    if (this.selected){
-      stroke(greys[1]);
-      noFill();
-      ellipse(0,0,100);
-    }
-    rotate(45);
-    //tint(greys[0]);
-    image(BS3img,0,0,BS3img.width/8,BS3img.height/8);
+    imageMode(CENTER);
+    translate(this.x,this.y);
+    rotate(135);
+    tint(pinks[0]);
+    image(BS3img,0,0,BS3img.width*this.scale,BS3img.height*this.scale);
+
     pop();
   }
-
-  rollOver(px,py){
-
-  }
-
-  clicked(px,py){
-    let d= dist(px,py,this.x,this.y);
-    if (d<10){
-      this.selected=true;
-      print("HIT!");
-    }
-  }
-
 }
 
 class Battery{
@@ -148,7 +132,7 @@ function battlePane(){
 
   this.display = function(){
     push();
-    fill(cyanLight);
+    fill(cyans[2]);
     rect(margin,margin,width-2*margin,150);
     pop();
   }
